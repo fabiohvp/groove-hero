@@ -6,9 +6,11 @@
 		keyWidthMM = $bindable(),
 		loop,
 		isKeyboardCompact,
+		soundMode,
 		onspeedChange,
 		ontoggleLoop,
-		ontoggleKeyboardCompact
+		ontoggleKeyboardCompact,
+		ontoggleSoundMode
 	} = $props();
 
 	function handleSpeedChange(e: Event) {
@@ -17,15 +19,17 @@
 	}
 </script>
 
-<div class="z-10 flex flex-wrap items-center gap-8 border-b border-cyan-500/5 bg-[#0b111b]/98 px-8 py-2">
-	<div class="flex items-center gap-3">
+<div
+	class="z-10 flex flex-wrap items-center gap-8 border-b border-cyan-500/5 bg-[#0b111b]/98 px-8 py-2"
+>
+	<!-- <div class="flex items-center gap-3">
 		<span class="text-[10px] tracking-widest text-slate-500 uppercase">Pontuação</span>
 		<span
 			class="font-['Orbitron'] text-xl text-yellow-400 drop-shadow-[0_0_8px_rgba(255,230,0,0.5)]"
 			>{Math.round(score)}</span
 		>
 	</div>
-	<div class="h-5 w-px bg-cyan-500/10"></div>
+	<div class="h-5 w-px bg-cyan-500/10"></div> -->
 	<div class="flex items-center gap-3">
 		<span class="text-[10px] tracking-widest text-slate-500 uppercase">Velocidade</span>
 		<input
@@ -87,6 +91,31 @@
 				: ''}">↻</span
 		>
 		Loop
+	</button>
+	<div class="h-5 w-px bg-cyan-500/10"></div>
+	<button
+		onclick={ontoggleSoundMode}
+		class="flex cursor-pointer items-center gap-2 text-[10px] tracking-widest text-cyan-400 uppercase transition-colors"
+		title="Alternar entre som da música e som ao tocar nas teclas"
+	>
+		<svg
+			class="h-4 w-4"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="2"
+			stroke-linecap="round"
+			stroke-linejoin="round"
+		>
+			<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+			{#if soundMode === 'music'}
+				<path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+			{:else}
+				<path d="M17 14l-4-4m0 4l4-4" stroke="currentColor"></path>
+				<circle cx="15" cy="12" r="3" fill="currentColor"></circle>
+			{/if}
+		</svg>
+		<span>SOM: {soundMode === 'music' ? 'MÚSICA' : 'JOGADOR'}</span>
 	</button>
 	<div class="h-5 w-px bg-cyan-500/10"></div>
 	<button

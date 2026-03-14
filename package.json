@@ -13,8 +13,7 @@
 		"test": "vitest",
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
-		"create-db": "npx tsx src/cli.ts --create-db",
-		"create-midis": "npx tsx src/cli.ts --create-midis"
+		"create-db": "npx tsx src/cli.ts --create-midis && npx tsx src/cli.ts --create-db"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^2.0.2",

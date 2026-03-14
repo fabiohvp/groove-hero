@@ -5,15 +5,15 @@
 	import Hud from '$lib/components/Hud.svelte';
 	import Timeline from '$lib/components/Timeline.svelte';
 	import {
-		gameState,
-		togglePlay,
 		fullReset,
-		handleSongSelect,
-		handleSpeedChange,
+		gameState,
+		getProgress,
 		handleKeyDown,
 		handleKeyUp,
+		handleSongSelect,
+		handleSpeedChange,
 		seekPercentage,
-		getProgress
+		togglePlay
 	} from '$lib/game.svelte';
 	import { onMount } from 'svelte';
 
@@ -22,7 +22,9 @@
 	let fallZoneEl = $state<HTMLElement>();
 
 	onMount(() => {
-		const observer = new ResizeObserver(() => (gameState.fallZoneHeight = fallZoneEl!.clientHeight));
+		const observer = new ResizeObserver(
+			() => (gameState.fallZoneHeight = fallZoneEl!.clientHeight)
+		);
 		observer.observe(fallZoneEl!);
 		return () => observer.disconnect();
 	});
@@ -77,6 +79,7 @@
 
 	<Controls
 		playing={gameState.playing}
+		hasSong={!!gameState.currentSongInfo}
 		ontogglePlay={togglePlay}
 		onfullReset={fullReset}
 		onsongSelect={handleSongSelect}
@@ -89,9 +92,12 @@
 		bind:keyWidthMM={gameState.keyWidthMM}
 		loop={gameState.loop}
 		isKeyboardCompact={gameState.isKeyboardCompact}
+		soundMode={gameState.soundMode}
 		onspeedChange={handleSpeedChange}
 		ontoggleLoop={() => (gameState.loop = !gameState.loop)}
 		ontoggleKeyboardCompact={() => (gameState.isKeyboardCompact = !gameState.isKeyboardCompact)}
+		ontoggleSoundMode={() =>
+			(gameState.soundMode = gameState.soundMode === 'music' ? 'player' : 'music')}
 	/>
 
 	<Timeline progress={getProgress()} elapsedBase={gameState.elapsedBase} onseek={seek} />

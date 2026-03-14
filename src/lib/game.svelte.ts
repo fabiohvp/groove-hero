@@ -1,4 +1,4 @@
-import { playNote, stopAllNotes } from './audio';
+import { playNote, stopNote, stopAllNotes } from './audio';
 import type { MidiFileInfo, Song } from './types';
 import { SvelteMap } from 'svelte/reactivity';
 
@@ -27,7 +27,8 @@ export const gameState = $state({
 	lastTs: performance.now(),
 	lastFrameTime: performance.now(),
 	fallZoneHeight: 360,
-	isKeyboardCompact: true
+	isKeyboardCompact: true,
+	soundMode: 'music' as 'music' | 'player'
 });
 
 export const scheduledNotes: number[] = [];
@@ -198,6 +199,10 @@ export function handleKeyDown(midi: number) {
 	if (pressedKeys.has(midi)) return;
 	pressedKeys.set(midi, true);
 
+	if (gameState.soundMode === 'player') {
+		playNote(midi);
+	}
+
 	if (gameState.playing && gameState.startTime) {
 		const currentElapsed =
 			(performance.now() - gameState.startTime) * gameState.speed + gameState.elapsedBase;
@@ -213,6 +218,10 @@ export function handleKeyDown(midi: number) {
 export function handleKeyUp(midi: number) {
 	if (!pressedKeys.has(midi)) return;
 	pressedKeys.delete(midi);
+
+	if (gameState.soundMode === 'player') {
+		stopNote(midi);
+	}
 }
 
 export function startAudio() {
@@ -225,7 +234,7 @@ export function startAudio() {
 		if (note.t >= elapsed) {
 			const delay = (note.t - elapsed) / gameState.speed;
 			const id = window.setTimeout(() => {
-				if (gameState.playing && !note.hit) playNote(note.midi, note.d, gameState.speed);
+				if (gameState.playing && !note.hit && gameState.soundMode === 'music') playNote(note.midi, note.d, gameState.speed);
 			}, delay);
 			scheduledNotes.push(id);
 		}
