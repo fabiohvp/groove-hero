@@ -108,7 +108,7 @@
 		</div>
 	</div>
 
-	<div class="search-container rounded-sm border border-cyan-500/20">
+	<div class="search-container border-none">
 		<input
 			bind:this={inputElement}
 			type="text"
@@ -118,7 +118,7 @@
 			onfocus={handleFocus}
 			onblur={handleBlur}
 			onkeydown={handleKeydown}
-			class="bg-cyan-500/5 text-cyan-400 placeholder:text-cyan-500/30"
+			class="rounded-sm border border-cyan-500/20 bg-cyan-500/5 text-cyan-500 placeholder:text-cyan-500/30 focus:ring-2 focus:ring-cyan-400 focus:outline-none"
 		/>
 		{#if showDropdown && filteredSongs.length > 0}
 			<div class="dropdown">
@@ -150,7 +150,8 @@
 	}
 	input {
 		width: 100%;
-		padding: 8px;
+		padding-inline: 10px;
+		padding-block: 4px;
 		box-sizing: border-box;
 	}
 	.dropdown {

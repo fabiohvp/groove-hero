@@ -39,7 +39,7 @@
 			step="0.25"
 			value={speed}
 			oninput={handleSpeedChange}
-			class="w-16 cursor-pointer appearance-none rounded-sm border border-cyan-500/20 bg-cyan-500/10 text-center"
+			class="w-16 cursor-pointer appearance-none rounded-sm border border-cyan-500/20 bg-cyan-500/5 text-center text-cyan-500 placeholder:text-cyan-500/30 focus:ring-2 focus:ring-cyan-400 focus:outline-none"
 		/>
 	</div>
 	<div class="h-5 w-px bg-cyan-500/10"></div>
@@ -48,7 +48,7 @@
 		<div class="relative">
 			<select
 				bind:value={keyCount}
-				class="appearance-none rounded border border-cyan-500/20 bg-cyan-500/5 py-1.5 pr-8 pl-4 text-xs font-semibold text-cyan-400 focus:ring-2 focus:ring-cyan-400 focus:outline-none"
+				class="appearance-none rounded border border-cyan-500/20 bg-cyan-500/5 py-1 pr-8 pl-4 text-xs font-semibold text-cyan-400 focus:ring-2 focus:ring-cyan-400 focus:outline-none"
 			>
 				<option class="bg-[#0d1520] font-sans" value={25}>25</option>
 				<option class="bg-[#0d1520] font-sans" value={49}>49</option>
@@ -75,7 +75,7 @@
 			max="24"
 			step="0.1"
 			bind:value={keyWidthMM}
-			class="w-16 cursor-pointer appearance-none rounded-sm border border-cyan-500/20 bg-cyan-500/10 text-center"
+			class="w-16 cursor-pointer appearance-none rounded-sm border border-cyan-500/20 bg-cyan-500/5 text-center text-cyan-500 placeholder:text-cyan-500/30 focus:ring-2 focus:ring-cyan-400 focus:outline-none"
 		/>
 	</div>
 	<div class="h-5 w-px bg-cyan-500/10"></div>
