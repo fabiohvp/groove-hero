@@ -10,7 +10,7 @@
 		"prepare": "svelte-kit sync || echo ''",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-		"test": "npx tsx src/lib/test.ts",
+		"test": "vitest",
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
 		"create-db": "npx tsx src/cli.ts --create-db",
@@ -41,7 +41,10 @@
 		"vite-plugin-devtools-json": "^1.0.0"
 	},
 	"dependencies": {
+		"@testing-library/jest-dom": "^6.9.1",
+		"@testing-library/svelte": "^5.3.1",
 		"fuse.js": "^7.1.0",
+		"jsdom": "^28.1.0",
 		"midi-file": "^1.2.4",
 		"vitest": "^4.1.0"
 	}

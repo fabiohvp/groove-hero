@@ -42,7 +42,10 @@ async function createDatabase(rootPath: string) {
 	for (const midiFile of midiFiles) {
 		try {
 			const relativeDir = path.dirname(midiFile.path);
-			const jsonPath = path.join(databasePath, relativeDir, `${safeFilePath(midiFile.name)}.json`);
+			const outputFileName = `${safeFilePath(midiFile.name)}.json`;
+			midiFile.jsonPath = path.join(relativeDir, outputFileName);
+			
+			const jsonPath = path.join(databasePath, midiFile.jsonPath);
 			const jsonContent = await fs.readFile(jsonPath, 'utf-8');
 			const song = JSON.parse(jsonContent) as Song;
 
