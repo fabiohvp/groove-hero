@@ -17,9 +17,7 @@ const midiFiles = JSON.parse(dbContent);
 describe('Game fall synchronization across all database songs', () => {
 	beforeEach(() => {
 		vi.useFakeTimers();
-		vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
-			return setTimeout(() => cb(performance.now()), 16);
-		});
+		vi.stubGlobal('requestAnimationFrame', vi.fn());
 	});
 
 	afterEach(() => {
