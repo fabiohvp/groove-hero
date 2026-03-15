@@ -1,16 +1,19 @@
 # 🎹 PianoFlow
 
 ## This project was my way of testing GEMINI AI capabilities. This was done almost all vibe coding.
-A browser-based rhythm piano game inspired by Guitar Hero, built for beginners learning to play piano. Blocks fall from the top of the screen toward a hit line aligned with an interactive piano keyboard — press the right key at the right time to score points.
+
+A browser-based rhythm piano game inspired by Guitar Hero and VRTuos, built for beginners learning to play piano. Blocks fall from the top of the screen toward a hit line aligned with an interactive piano keyboard — press the right key at the right time to score points.
 
 ## Adding Songs
 
 Add .mid or .midi files to the `static/musics/` directory then run `npm run create-db`. This will generate necessary JSON files in `src/lib/database/`.
+
 - Recommended repository with thousands of musics: https://github.com/lucasnfe/adl-piano-midi
 
 ## How to run locally
 
 Execute `npm run dev -- --open` in the terminal and wait for browser to open and load.
+
 - Suggestion: use it with a screen bigger than your piano and try to position the screen inclined above the piano keyboard matching the keys on the screen with the piano keys (adjust keys amount and width as necessary). If you want to use with your TV you can use Port Forwarding and open in the browser.
 
 ---
@@ -40,7 +43,6 @@ Works in any browser with Web Audio API and CSS `transform` support — Chrome, 
   | Key  | A   | W   | S   | E   | D   | F   | T   | G   | Y   | H   | U   | J   | K   | O   | L   | P   |
   | ---- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
   | Note | C4  | C#4 | D4  | D#4 | E4  | F4  | F#4 | G4  | G#4 | A4  | A#4 | B4  | C5  | C#5 | D5  | D#5 | -->
-
 
 ## Future
 
