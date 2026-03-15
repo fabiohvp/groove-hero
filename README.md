@@ -20,7 +20,7 @@ Execute `npm run dev -- --open` in the terminal and wait for browser to open and
 
 ## Browser Support
 
-Works in any browser with Web Audio API and CSS `transform` support — Chrome, Firefox, Safari, Edge (all modern versions).
+Works in any browser with Web Audio API and CSS `transform` support — Chrome, Firefox, Safari, Edge (all modern versions, also WebOS Browser).
 
 ---
 
