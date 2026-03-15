@@ -2,7 +2,7 @@
 
 ## This project was my way of testing GEMINI AI capabilities. This was done almost all vibe coding.
 
-A browser-based rhythm piano game inspired by Guitar Hero and VRTuos, built for beginners learning to play piano. Blocks fall from the top of the screen toward a hit line aligned with an interactive piano keyboard — press the right key at the right time to score points.
+A browser-based rhythm piano game inspired by Guitar Hero and VRTuos, built for beginners learning to play piano. Blocks fall from the top of the screen toward a hit line aligned with an interactive piano keyboard.
 
 ## Adding Songs
 
