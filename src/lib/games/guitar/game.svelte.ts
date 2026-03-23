@@ -35,6 +35,8 @@ export const gameState = $state({
 	elapsedBase: 0,
 	startTime: null as number | null,
 	fretsCount: getSavedSetting('gt_fretsCount', 24),
+	isLeftHanded: getSavedSetting('gt_isLeftHanded', false),
+	backgroundMode: getSavedSetting('gt_backgroundMode', 'dark') as 'dark' | 'light',
 	currentSong: defaultSong,
 	lastTs: typeof performance !== 'undefined' ? performance.now() : 0,
 	lastFrameTime: typeof performance !== 'undefined' ? performance.now() : 0,
@@ -54,6 +56,8 @@ $effect.root(() => {
 			localStorage.setItem('gt_loop', JSON.stringify(gameState.loop));
 			localStorage.setItem('gt_fretsCount', JSON.stringify(gameState.fretsCount));
 			localStorage.setItem('gt_noteColor', JSON.stringify(gameState.noteColor));
+			localStorage.setItem('gt_isLeftHanded', JSON.stringify(gameState.isLeftHanded));
+			localStorage.setItem('gt_backgroundMode', JSON.stringify(gameState.backgroundMode));
 		}
 	});
 

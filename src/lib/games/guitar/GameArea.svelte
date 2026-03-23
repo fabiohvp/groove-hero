@@ -68,10 +68,10 @@
 
 <main class="z-5 flex-1 self-stretch flex flex-col overflow-hidden">
 	<!-- Top Area: Falling Notes container -->
-	<div class="relative flex flex-1 flex-row mb-48" bind:this={fallZoneEl}>
+	<div class="relative flex flex-1 {gameState.isLeftHanded ? 'flex-row-reverse' : 'flex-row'} mb-48" bind:this={fallZoneEl}>
 		
-		<!-- Left Spacer matching Guitar strumming patterns width: 32 tailwind width units (128px) -->
-		<div class="relative z-20 w-32 flex-shrink-0 border-r-2 border-pink-500/10 bg-transparent flex-[0_0_128px] overflow-hidden">
+		<!-- Left Spacer matching Guitar strumming patterns width: 16 tailwind width units (64px) -->
+		<div class="relative z-20 w-16 flex-shrink-0 {gameState.isLeftHanded ? 'border-l-2' : 'border-r-2'} border-pink-500/10 bg-transparent flex-[0_0_64px] overflow-hidden">
 			<!-- Falling Strum Directions -->
 			{#each strums as strum}
 				{@const pxPerMs = BASE_SPEED * gameState.speed}
@@ -95,13 +95,13 @@
 		</div>
 
 		<!-- Falling zone corresponding to the fretboard -->
-		<div class="relative flex-1 bg-gradient-to-b from-transparent to-pink-500/5">
+		<div class="relative flex-1 {gameState.backgroundMode === 'light' ? 'bg-slate-100' : 'bg-transparent'} bg-gradient-to-b from-transparent to-pink-500/5 transition-colors duration-500">
 			
 			<!-- Vertical Guide Lines per Fret -->
 			{#each Array.from({ length: fretsCount + 1 }) as _, i}
 				<div
 					class="absolute top-0 bottom-0 w-px bg-pink-500/10"
-					style="left: {getFretLeftPercentage(i)}%;"
+					style="{gameState.isLeftHanded ? 'right' : 'left'}: {getFretLeftPercentage(i)}%;"
 				></div>
 			{/each}
 
@@ -124,7 +124,7 @@
 						<div
 							class="absolute rounded-sm border-b-4 opacity-90 transition-colors"
 							style="
-								left: {getFretLeftPercentage(pos.fretIndex)}%;
+								{gameState.isLeftHanded ? 'right' : 'left'}: {getFretLeftPercentage(pos.fretIndex)}%;
 								width: {100 / fretsCount}%;
 								top: {yTop}px;
 								height: {height}px;

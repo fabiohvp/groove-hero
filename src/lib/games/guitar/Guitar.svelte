@@ -86,11 +86,11 @@
 </script>
 
 <div
-	class="absolute right-0 bottom-0 left-0 flex h-48 w-full select-none overflow-hidden border-t-4 border-pink-500/20 bg-gradient-to-br from-[#1a0a0a] via-[#301616] to-[#120505] shadow-[0_-15px_40px_rgba(236,72,153,0.15)]"
+	class="absolute right-0 bottom-0 left-0 flex {gameState.isLeftHanded ? 'flex-row-reverse' : 'flex-row'} h-48 w-full select-none overflow-hidden border-t-4 border-pink-500/20 bg-gradient-to-br from-[#1a0a0a] via-[#301616] to-[#120505] shadow-[0_-15px_40px_rgba(236,72,153,0.15)]"
 >
 	<!-- Strumming Patterns Area -->
-	<div class="relative z-30 flex w-32 flex-[0_0_128px] flex-col items-center justify-center border-r-[3px] border-pink-500/30 bg-[#0a0303] shadow-[5px_0_15px_rgba(0,0,0,0.8)]">
-		<span class="mb-4 font-['Orbitron'] text-[10px] font-bold tracking-[4px] text-pink-500/70">STRUM</span>
+	<div class="relative z-30 flex w-16 flex-[0_0_64px] flex-col items-center justify-center {gameState.isLeftHanded ? 'border-l-[3px]' : 'border-r-[3px]'} border-pink-500/30 bg-[#0a0303] shadow-[5px_0_15px_rgba(0,0,0,0.8)]">
+		<span class="mb-4 font-['Orbitron'] text-[8px] font-bold tracking-[2px] text-pink-500/70 text-center uppercase" style="writing-mode: vertical-rl; transform: rotate(180deg);">STRUM</span>
 		<div class="flex flex-col gap-3">
 			<div class="flex h-10 w-10 items-center justify-center rounded-lg border transition-all {activeStrumDir === 'up' ? 'scale-110 border-pink-400 bg-pink-500/40 shadow-[0_0_20px_#ec4899] brightness-125' : 'border-pink-500/50 bg-gradient-to-b from-pink-500/20 to-transparent shadow-[0_0_15px_rgba(236,72,153,0.3)]'}">
 				<span class="text-xl font-bold {activeStrumDir === 'up' ? 'text-white drop-shadow-[0_0_8px_#fff]' : 'text-pink-400'}">↑</span>
@@ -113,7 +113,7 @@
 	{#each Array.from({ length: c }) as _, i}
 		<div
 			class="absolute top-0 bottom-0 w-1.5 bg-gradient-to-r from-slate-400 via-slate-100 to-slate-500 shadow-[-2px_0_5px_rgba(0,0,0,0.8)]"
-			style="left: {getFretLeftPercentage(i + 1)}%;"
+			style="{gameState.isLeftHanded ? 'right' : 'left'}: {getFretLeftPercentage(i + 1)}%;"
 		></div>
 	{/each}
 
@@ -121,20 +121,20 @@
 	{#each singleDots as fret}
 		{#if fret <= c}
 			<div
-				class="absolute top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/10 bg-gradient-to-br from-white/80 to-slate-300 shadow-[inset_0_2px_5px_rgba(0,0,0,0.4)]"
-				style="left: {getMidFretPercentage(fret)}%;"
+				class="absolute top-1/2 h-5 w-5 {gameState.isLeftHanded ? 'translate-x-1/2' : '-translate-x-1/2'} -translate-y-1/2 rounded-full border border-white/10 bg-gradient-to-br from-white/80 to-slate-300 shadow-[inset_0_2px_5px_rgba(0,0,0,0.4)]"
+				style="{gameState.isLeftHanded ? 'right' : 'left'}: {getMidFretPercentage(fret)}%;"
 			></div>
 		{/if}
 	{/each}
 	{#each doubleDots as fret}
 		{#if fret <= c}
 			<div
-				class="absolute top-1/3 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/10 bg-gradient-to-br from-white/80 to-slate-300 shadow-[inset_0_2px_5px_rgba(0,0,0,0.4)]"
-				style="left: {getMidFretPercentage(fret)}%;"
+				class="absolute top-1/3 h-5 w-5 {gameState.isLeftHanded ? 'translate-x-1/2' : '-translate-x-1/2'} -translate-y-1/2 rounded-full border border-white/10 bg-gradient-to-br from-white/80 to-slate-300 shadow-[inset_0_2px_5px_rgba(0,0,0,0.4)]"
+				style="{gameState.isLeftHanded ? 'right' : 'left'}: {getMidFretPercentage(fret)}%;"
 			></div>
 			<div
-				class="absolute top-2/3 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/10 bg-gradient-to-br from-white/80 to-slate-300 shadow-[inset_0_2px_5px_rgba(0,0,0,0.4)]"
-				style="left: {getMidFretPercentage(fret)}%;"
+				class="absolute top-2/3 h-5 w-5 {gameState.isLeftHanded ? 'translate-x-1/2' : '-translate-x-1/2'} -translate-y-1/2 rounded-full border border-white/10 bg-gradient-to-br from-white/80 to-slate-300 shadow-[inset_0_2px_5px_rgba(0,0,0,0.4)]"
+				style="{gameState.isLeftHanded ? 'right' : 'left'}: {getMidFretPercentage(fret)}%;"
 			></div>
 		{/if}
 	{/each}
@@ -152,7 +152,7 @@
 				></div>
 
 				<!-- The interactive frets row covering this specific string -->
-				<div class="relative z-20 flex flex-1 self-stretch">
+				<div class="relative z-20 flex flex-1 self-stretch {gameState.isLeftHanded ? 'flex-row-reverse' : 'flex-row'}">
 					{#each Array.from({ length: c }) as _, f}
 						<!-- svelte-ignore a11y_click_events_have_key_events -->
 						<!-- svelte-ignore a11y_no_static_element_interactions -->

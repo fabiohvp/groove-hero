@@ -36,6 +36,14 @@
 		const pct = (e.clientX - rect.left) / rect.width;
 		seekPercentage(pct);
 	}
+
+	function toggleOptions() {
+		showTopBars = !showTopBars;
+		// Auto start or resume the game if hiding the menu while a song exists
+		if (!showTopBars && gameState.currentSongInfo && !gameState.playing) {
+			togglePlay();
+		}
+	}
 </script>
 
 <div
@@ -52,7 +60,7 @@
 
 	<button
 		class="absolute top-4 right-4 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-pink-500/20 text-pink-400 backdrop-blur transition-all hover:bg-pink-500/40"
-		onclick={() => (showTopBars = !showTopBars)}
+		onclick={toggleOptions}
 		title={showTopBars ? 'Hide options' : 'Show options'}
 	>
 		<svg
@@ -86,6 +94,8 @@
 			speed={gameState.speed}
 			bind:fretsCount={gameState.fretsCount}
 			bind:noteColor={gameState.noteColor}
+			bind:isLeftHanded={gameState.isLeftHanded}
+			bind:backgroundMode={gameState.backgroundMode}
 			loop={gameState.loop}
 			soundMode={gameState.soundMode}
 			onspeedChange={handleSpeedChange}

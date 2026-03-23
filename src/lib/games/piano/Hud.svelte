@@ -5,6 +5,7 @@
 		keyCount = $bindable(),
 		keyWidthMM = $bindable(),
 		noteColor = $bindable(),
+		backgroundMode = $bindable(),
 		loop,
 		isKeyboardCompact,
 		soundMode,
@@ -24,7 +25,7 @@
 </script>
 
 <div
-	class="z-10 flex flex-wrap items-center gap-4 border-b border-cyan-500/5 bg-[#0b111b]/98 px-8 py-2"
+	class="z-10 flex flex-nowrap items-center gap-4 overflow-x-auto whitespace-nowrap border-b border-cyan-500/5 bg-[#0b111b]/98 px-8 py-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
 >
 	<!-- <div class="flex items-center gap-3">
 		<span class="text-[10px] tracking-widest text-slate-500 uppercase">Score</span>
@@ -92,6 +93,28 @@
 				<option class="bg-[#0d1520] font-sans" value="synthwave">Synthwave</option>
 				<option class="bg-[#0d1520] font-sans" value="monochrome">Monochrome</option>
 				<option class="bg-[#0d1520] font-sans" value="forest">Forest</option>
+			</select>
+			<div
+				class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-cyan-400"
+			>
+				<svg class="h-4 w-4 fill-current" viewBox="0 0 20 20"
+					><path
+						d="M5.516 7.548c.436-.446 1.143-.446 1.579 0L10 10.405l2.905-2.857c.436-.446 1.143-.446 1.579 0 .436.445.436 1.167 0 1.612l-3.694 3.639c-.436.445-1.143.445-1.579 0L5.516 9.16c-.436-.445-.436-1.167 0-1.612z"
+					/></svg
+				>
+			</div>
+		</div>
+	</div>
+	<div class="h-5 w-px bg-cyan-500/10"></div>
+	<div class="flex items-center gap-3">
+		<span class="text-[10px] tracking-widest text-slate-500 uppercase">Bg</span>
+		<div class="relative">
+			<select
+				bind:value={backgroundMode}
+				class="appearance-none rounded border border-cyan-500/20 bg-cyan-500/5 py-1 pr-8 pl-4 text-xs font-semibold text-cyan-400 focus:ring-2 focus:ring-cyan-400 focus:outline-none"
+			>
+				<option class="bg-[#0d1520] font-sans" value="dark">Dark</option>
+				<option class="bg-[#0d1520] font-sans" value="light">Light</option>
 			</select>
 			<div
 				class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-cyan-400"

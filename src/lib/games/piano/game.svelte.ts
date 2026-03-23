@@ -41,6 +41,7 @@ export const gameState = $state({
 	lastFrameTime: typeof performance !== 'undefined' ? performance.now() : 0,
 	fallZoneHeight: 360,
 	isKeyboardCompact: getSavedSetting('pf_isKeyboardCompact', true),
+	backgroundMode: getSavedSetting('pf_backgroundMode', 'dark') as 'dark' | 'light',
 	soundMode: 'music' as 'music' | 'player',
 	countdown: null as number | null,
 	noteColor: getSavedSetting('pf_noteColor', 'classic') as 'classic' | 'ocean' | 'sunset' | 'synthwave' | 'monochrome' | 'forest'
@@ -58,6 +59,7 @@ $effect.root(() => {
 			localStorage.setItem('pf_keyWidthMM', JSON.stringify(gameState.keyWidthMM));
 			localStorage.setItem('pf_isKeyboardCompact', JSON.stringify(gameState.isKeyboardCompact));
 			localStorage.setItem('pf_noteColor', JSON.stringify(gameState.noteColor));
+			localStorage.setItem('pf_backgroundMode', JSON.stringify(gameState.backgroundMode));
 		}
 	});
 

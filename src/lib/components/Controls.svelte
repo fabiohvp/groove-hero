@@ -5,7 +5,7 @@
 </script>
 
 <div
-	class="z-20 flex w-full items-center gap-4 border-b border-cyan-500/10 bg-[#0d1520]/95 px-6 py-2"
+	class="z-20 flex w-full flex-nowrap items-center gap-4 overflow-x-auto whitespace-nowrap border-b border-cyan-500/10 bg-[#0d1520]/95 px-6 py-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
 >
 	<button
 		onclick={ontogglePlay}

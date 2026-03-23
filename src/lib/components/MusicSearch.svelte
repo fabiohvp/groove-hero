@@ -11,6 +11,16 @@
 	let showDropdown = $state(false);
 	let selectedIndex = $state(-1);
 	let inputElement: HTMLInputElement;
+	let dropdownElement = $state<HTMLDivElement>();
+
+	$effect(() => {
+		if (showDropdown && inputElement && dropdownElement) {
+			const rect = inputElement.getBoundingClientRect();
+			dropdownElement.style.top = `${rect.bottom}px`;
+			dropdownElement.style.left = `${rect.left}px`;
+			dropdownElement.style.width = `${rect.width}px`;
+		}
+	});
 
 	onMount(async () => {
 		try {
@@ -29,7 +39,13 @@
 	const difficulties = ['all', ...new Set(['Beginner', 'Intermediate', 'Advanced'])];
 	const categories = $derived([
 		'all',
-		...Array.from(new Set(MIDI_FILES.map((s) => s.category))).sort()
+		...Array.from(
+			new Set(
+				MIDI_FILES.filter(
+					(s) => selectedDifficulty === 'all' || s.difficulty === selectedDifficulty
+				).map((s) => s.category)
+			)
+		).sort()
 	]);
 
 	// Songs to be used by Fuse, derived from selected difficulty and category
@@ -40,6 +56,14 @@
 			return passDifficulty && passCategory;
 		})
 	);
+
+	$effect(() => {
+		if (selectedCategory !== 'all' && !categories.includes(selectedCategory)) {
+			selectedCategory = 'all';
+			// Triggers updating the drop-down list visually when category gets forcefully reset
+			handleFilterChange();
+		}
+	});
 
 	const fuse = $derived(
 		new Fuse(songsToSearch, {
@@ -172,7 +196,7 @@
 			class="rounded-sm border border-cyan-500/20 bg-cyan-500/5 text-cyan-500 placeholder:text-cyan-500/30 focus:ring-2 focus:ring-cyan-400 focus:outline-none"
 		/>
 		{#if showDropdown && filteredSongs.length > 0}
-			<div class="dropdown">
+			<div class="dropdown" bind:this={dropdownElement}>
 				{#each filteredSongs as song, i (song.path)}
 					<button
 						class:selected={i === selectedIndex}
@@ -206,7 +230,7 @@
 		box-sizing: border-box;
 	}
 	.dropdown {
-		position: absolute;
+		position: fixed;
 		width: 100%;
 		border: 1px solid #06b6d4;
 		border-top: none;

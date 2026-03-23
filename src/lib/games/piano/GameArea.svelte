@@ -46,7 +46,7 @@
 		<!-- Fall Zone -->
 		<div
 			bind:this={fallZoneEl}
-			class="absolute inset-x-0 top-0 overflow-hidden bg-white bg-gradient-to-b from-transparent to-cyan-500/5"
+			class="absolute inset-x-0 top-0 overflow-hidden {gameState.backgroundMode === 'light' ? 'bg-slate-100' : 'bg-transparent'} bg-gradient-to-b from-transparent to-cyan-500/5 transition-colors duration-500"
 			style="bottom: {pianoLayout.whiteH}px"
 		>
 			<!-- Vertical Guides -->
