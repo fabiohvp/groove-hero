@@ -1,4 +1,4 @@
-# 🎹 Groove Hero
+# Groove Hero
 
 ## This project was my way of testing GEMINI AI capabilities. This was done almost all vibe coding.
 

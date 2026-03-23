@@ -2,10 +2,10 @@ import { test, expect, describe, vi, beforeEach, afterEach } from 'vitest';
 import * as fs from 'fs';
 import * as path from 'path';
 import { gameState, restartGame } from './game.svelte';
-import * as audio from './audio';
-import type { Song } from './types';
+import * as audio from '$lib/audio';
+import type { Song } from '$lib/types';
 
-vi.mock('./audio', () => ({
+vi.mock('$lib/audio', () => ({
 	playNote: vi.fn(),
 	stopAllNotes: vi.fn()
 }));

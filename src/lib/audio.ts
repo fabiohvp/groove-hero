@@ -1,65 +1,76 @@
+import { Soundfont } from 'smplr';
+
 let audioCtx: AudioContext | null = null;
-const activeOscillators: Map<number, { oscs: OscillatorNode[], gain: GainNode }> = new Map();
+let pianoInstrument: Soundfont | null = null;
+let guitarInstrument: Soundfont | null = null;
 
-export function playNote(midi: number, durationMs?: number, speed?: number) {
-	if (!audioCtx) audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-	if (audioCtx.state === 'suspended') audioCtx.resume();
+function getContext() {
+	if (!audioCtx) {
+		audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+	}
+	if (audioCtx.state === 'suspended') {
+		audioCtx.resume();
+	}
+	return audioCtx;
+}
 
-	const freq = 440 * Math.pow(2, (midi - 69) / 12);
-	const now = audioCtx.currentTime;
+export function initInstrument(instrument: 'piano' | 'guitar') {
+	const ctx = getContext();
+	if (instrument === 'piano' && !pianoInstrument) {
+		pianoInstrument = new Soundfont(ctx, { instrument: 'electric_grand_piano' });
+	} else if (instrument === 'guitar' && !guitarInstrument) {
+		guitarInstrument = new Soundfont(ctx, { instrument: 'acoustic_guitar_steel' });
+	}
+}
 
-	const mg = audioCtx.createGain();
-	mg.connect(audioCtx.destination);
+const activeNotes = new Map<number, any>();
 
-	// Harmônicos para um som mais rico de piano
-	const harmonics = [1, 2, 3];
-	const oscs = harmonics.map((h) => {
-		const o = audioCtx!.createOscillator();
-		const g = audioCtx!.createGain();
-		o.type = 'triangle';
-		o.frequency.setValueAtTime(freq * h, now);
-		g.gain.setValueAtTime(0.2 / h, now);
-		o.connect(g);
-		g.connect(mg);
-		o.start(now);
-		return o;
-	});
+export function playNote(
+	midi: number,
+	durationMs?: number,
+	speed?: number,
+	instrument: 'piano' | 'guitar' = 'piano'
+) {
+	const ctx = getContext();
+	initInstrument(instrument);
 
-	mg.gain.setValueAtTime(0, now);
-	mg.gain.linearRampToValueAtTime(1, now + 0.005);
+	const time = ctx.currentTime;
+	// duration needs to be calculated in seconds for smplr
+	const durationSeconds = durationMs && speed ? (durationMs / 1000) / speed : undefined;
 
-	activeOscillators.set(midi, { oscs, gain: mg });
+	const targetInstrument = instrument === 'guitar' ? guitarInstrument : pianoInstrument;
 
-	if (durationMs && speed) {
-		const dur = durationMs / 1000 / speed;
-		mg.gain.exponentialRampToValueAtTime(0.001, now + dur + 0.8);
+	if (targetInstrument) {
+		const node = targetInstrument.start({
+			note: midi,
+			velocity: 80,
+			time: time,
+			duration: durationSeconds
+		});
 
-		setTimeout(() => {
-			oscs.forEach((o) => o.stop());
-			activeOscillators.delete(midi);
-		}, (dur + 1) * 1000);
+		// Track nodes for manual playback (where duration is unbound) so we can stop them on keyup
+		if (!durationMs) {
+			activeNotes.set(midi, node);
+		}
 	}
 }
 
 export function stopNote(midi: number) {
-	const active = activeOscillators.get(midi);
-	if (active && audioCtx) {
-		const now = audioCtx.currentTime;
-		active.gain.gain.cancelScheduledValues(now);
-		active.gain.gain.setValueAtTime(active.gain.gain.value, now);
-		active.gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
+	if (!audioCtx) return;
+	const time = audioCtx.currentTime;
 
-		activeOscillators.delete(midi);
-		setTimeout(() => active.oscs.forEach((o) => o.stop()), 250);
+	const node = activeNotes.get(midi);
+	if (node && node.stop) {
+		node.stop({ time });
+		activeNotes.delete(midi);
 	}
 }
 
 export function stopAllNotes() {
-	const now = audioCtx?.currentTime || 0;
-	activeOscillators.forEach(({ gain, oscs }) => {
-		gain.gain.cancelScheduledValues(now);
-		gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.1);
-		setTimeout(() => oscs.forEach(o => { o?.stop(); }), 150);
-	});
-	activeOscillators.clear();
+	if (!audioCtx) return;
+	const time = audioCtx.currentTime;
+
+	if (pianoInstrument) pianoInstrument.stop({ time });
+	if (guitarInstrument) guitarInstrument.stop({ time });
+	activeNotes.clear();
 }

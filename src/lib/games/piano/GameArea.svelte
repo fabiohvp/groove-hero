@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { gameState } from '$lib/game.svelte';
+	import { gameState } from '$lib/games/piano/game.svelte';
 	import Piano from './Piano.svelte';
 
 	let {

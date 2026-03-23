@@ -1,12 +1,12 @@
 <script lang="ts">
-	let { progress, elapsedBase, onseek } = $props();
+	let { progress, elapsedBase, onseek, disabled = false } = $props();
 </script>
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
-	class="z-10 flex h-8 w-full cursor-pointer items-center gap-4 border-b border-cyan-500/10 bg-[#080c14]/98 px-4"
-	onclick={onseek}
+	class="z-10 flex h-8 w-full items-center gap-4 border-b border-cyan-500/10 bg-[#080c14]/98 px-4 transition-opacity {disabled ? 'opacity-30 cursor-not-allowed grayscale' : 'cursor-pointer'}"
+	onclick={disabled ? null : onseek}
 >
 	<div class="relative h-1.5 flex-1 overflow-hidden rounded-full bg-cyan-500/10">
 		<div

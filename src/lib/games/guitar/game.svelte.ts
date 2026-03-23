@@ -1,6 +1,6 @@
 import { SvelteMap } from 'svelte/reactivity';
-import { playNote, stopAllNotes, stopNote } from './audio';
-import type { MidiFileInfo, Song } from './types';
+import { playNote, stopAllNotes, stopNote } from '$lib/audio';
+import type { MidiFileInfo, Song } from '$lib/types';
 
 const defaultSong: Song = {
 	path: '',
@@ -27,23 +27,21 @@ function getSavedSetting<T>(key: string, defaultValue: T): T {
 // Reactive states (Runes)
 export const gameState = $state({
 	playing: false,
-	loop: getSavedSetting('pf_loop', true),
+	loop: getSavedSetting('gt_loop', true),
 	currentSongInfo: null as MidiFileInfo | null,
 	speed: 1,
 	score: 0,
 	combo: 0,
 	elapsedBase: 0,
 	startTime: null as number | null,
-	keyCount: getSavedSetting('pf_keyCount', 61),
-	keyWidthMM: getSavedSetting('pf_keyWidthMM', 22),
+	fretsCount: getSavedSetting('gt_fretsCount', 24),
 	currentSong: defaultSong,
 	lastTs: typeof performance !== 'undefined' ? performance.now() : 0,
 	lastFrameTime: typeof performance !== 'undefined' ? performance.now() : 0,
 	fallZoneHeight: 360,
-	isKeyboardCompact: getSavedSetting('pf_isKeyboardCompact', true),
 	soundMode: 'music' as 'music' | 'player',
 	countdown: null as number | null,
-	noteColor: getSavedSetting('pf_noteColor', 'classic') as 'classic' | 'ocean' | 'sunset' | 'synthwave' | 'monochrome' | 'forest'
+	noteColor: getSavedSetting('gt_noteColor', 'classic') as 'classic' | 'ocean' | 'sunset' | 'synthwave' | 'monochrome' | 'forest'
 });
 
 export const scheduledNotes: number[] = [];
@@ -53,11 +51,9 @@ export const pressedKeys = new SvelteMap<number, boolean>();
 $effect.root(() => {
 	$effect(() => {
 		if (typeof window !== 'undefined') {
-			localStorage.setItem('pf_loop', JSON.stringify(gameState.loop));
-			localStorage.setItem('pf_keyCount', JSON.stringify(gameState.keyCount));
-			localStorage.setItem('pf_keyWidthMM', JSON.stringify(gameState.keyWidthMM));
-			localStorage.setItem('pf_isKeyboardCompact', JSON.stringify(gameState.isKeyboardCompact));
-			localStorage.setItem('pf_noteColor', JSON.stringify(gameState.noteColor));
+			localStorage.setItem('gt_loop', JSON.stringify(gameState.loop));
+			localStorage.setItem('gt_fretsCount', JSON.stringify(gameState.fretsCount));
+			localStorage.setItem('gt_noteColor', JSON.stringify(gameState.noteColor));
 		}
 	});
 
@@ -114,6 +110,30 @@ export function getDuration() {
 	if (!gameState.currentSong?.notes || gameState.currentSong.notes.length === 0) return 1500;
 	const lastNote = gameState.currentSong.notes.reduce((p, c) => (c.t + c.d > p.t + p.d ? c : p));
 	return lastNote.t + lastNote.d + 1500;
+}
+
+export function getGuitarPosition(midi: number, fretsCount: number): { stringIndex: number; fretIndex: number } {
+	const strings = [40, 45, 50, 55, 59, 64]; // E2, A2, D3, G3, B3, E4
+	
+	let bestS = -1;
+	let bestF = -1;
+
+	for (let s = strings.length - 1; s >= 0; s--) {
+		const tuning = strings[s];
+		const f = midi - tuning;
+		if (f >= 0 && f <= fretsCount) {
+			bestS = s;
+			bestF = f;
+			break;
+		}
+	}
+	
+	if (bestS === -1) {
+		if (midi < 40) return getGuitarPosition(midi + 12, fretsCount);
+		else return getGuitarPosition(midi - 12, fretsCount);
+	}
+
+	return { stringIndex: bestS, fretIndex: bestF };
 }
 
 export function getProgress() {
@@ -258,7 +278,7 @@ export function handleKeyDown(midi: number) {
 	pressedKeys.set(midi, true);
 
 	if (gameState.soundMode === 'player') {
-		playNote(midi);
+		playNote(midi, undefined, undefined, 'guitar');
 	}
 
 	if (gameState.playing && gameState.startTime) {
@@ -292,7 +312,7 @@ export function startAudio() {
 		if (note.t >= elapsed) {
 			const delay = (note.t - elapsed) / gameState.speed;
 			const id = window.setTimeout(() => {
-				if (gameState.playing && !note.hit && gameState.soundMode === 'music') playNote(note.midi, note.d, gameState.speed);
+				if (gameState.playing && !note.hit && gameState.soundMode === 'music') playNote(note.midi, note.d, gameState.speed, 'guitar');
 			}, delay);
 			scheduledNotes.push(id);
 		}
