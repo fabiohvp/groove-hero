@@ -14,9 +14,12 @@
 		ontoggleSoundMode
 	} = $props();
 
-	function handleSpeedChange(e: Event) {
-		const newSpeed = parseFloat((e.currentTarget as HTMLInputElement).value);
-		onspeedChange(newSpeed);
+	function decreaseSpeed() {
+		onspeedChange(Math.max(0.25, speed - 0.25));
+	}
+
+	function increaseSpeed() {
+		onspeedChange(Math.min(5, speed + 0.25));
 	}
 </script>
 
@@ -24,7 +27,7 @@
 	class="z-10 flex flex-wrap items-center gap-4 border-b border-cyan-500/5 bg-[#0b111b]/98 px-8 py-2"
 >
 	<!-- <div class="flex items-center gap-3">
-		<span class="text-[10px] tracking-widest text-slate-500 uppercase">Pontuação</span>
+		<span class="text-[10px] tracking-widest text-slate-500 uppercase">Score</span>
 		<span
 			class="font-['Orbitron'] text-xl text-yellow-400 drop-shadow-[0_0_8px_rgba(255,230,0,0.5)]"
 			>{Math.round(score)}</span
@@ -32,20 +35,28 @@
 	</div>
 	<div class="h-5 w-px bg-cyan-500/10"></div> -->
 	<div class="flex items-center gap-3">
-		<span class="text-[10px] tracking-widest text-slate-500 uppercase">Velocidade</span>
-		<input
-			type="number"
-			min="0.25"
-			max="5"
-			step="0.25"
-			value={speed}
-			oninput={handleSpeedChange}
-			class="w-16 cursor-pointer appearance-none rounded-sm border border-cyan-500/20 bg-cyan-500/5 text-center text-cyan-500 placeholder:text-cyan-500/30 focus:ring-2 focus:ring-cyan-400 focus:outline-none"
-		/>
+		<span class="text-[10px] tracking-widest text-slate-500 uppercase">Speed</span>
+		<div class="flex items-center rounded-sm border border-cyan-500/20 bg-cyan-500/5">
+			<button
+				onclick={decreaseSpeed}
+				class="px-3 py-0.25 text-cyan-500 transition-colors hover:bg-cyan-500/20 hover:text-cyan-400 focus:outline-none disabled:opacity-50"
+				disabled={speed <= 0.25}
+			>
+				-
+			</button>
+			<span class="w-10 text-center text-sm font-semibold text-cyan-400">{speed}x</span>
+			<button
+				onclick={increaseSpeed}
+				class="px-3 py-0.25 text-cyan-500 transition-colors hover:bg-cyan-500/20 hover:text-cyan-400 focus:outline-none disabled:opacity-50"
+				disabled={speed >= 5}
+			>
+				+
+			</button>
+		</div>
 	</div>
 	<div class="h-5 w-px bg-cyan-500/10"></div>
 	<div class="flex items-center gap-3">
-		<span class="text-[10px] tracking-widest text-slate-500 uppercase">Teclas</span>
+		<span class="text-[10px] tracking-widest text-slate-500 uppercase">Keys</span>
 		<div class="relative">
 			<select
 				bind:value={keyCount}
@@ -69,18 +80,18 @@
 	</div>
 	<div class="h-5 w-px bg-cyan-500/10"></div>
 	<div class="flex items-center gap-3">
-		<span class="text-[10px] tracking-widest text-slate-500 uppercase">Cores</span>
+		<span class="text-[10px] tracking-widest text-slate-500 uppercase">Colors</span>
 		<div class="relative">
 			<select
 				bind:value={noteColor}
 				class="appearance-none rounded border border-cyan-500/20 bg-cyan-500/5 py-1 pr-8 pl-4 text-xs font-semibold text-cyan-400 focus:ring-2 focus:ring-cyan-400 focus:outline-none"
 			>
-				<option class="bg-[#0d1520] font-sans" value="classic">Clássico</option>
-				<option class="bg-[#0d1520] font-sans" value="ocean">Oceano</option>
-				<option class="bg-[#0d1520] font-sans" value="sunset">Pôr do Sol</option>
+				<option class="bg-[#0d1520] font-sans" value="classic">Classic</option>
+				<option class="bg-[#0d1520] font-sans" value="ocean">Ocean</option>
+				<option class="bg-[#0d1520] font-sans" value="sunset">Sunset</option>
 				<option class="bg-[#0d1520] font-sans" value="synthwave">Synthwave</option>
-				<option class="bg-[#0d1520] font-sans" value="monochrome">Monocromático</option>
-				<option class="bg-[#0d1520] font-sans" value="forest">Floresta</option>
+				<option class="bg-[#0d1520] font-sans" value="monochrome">Monochrome</option>
+				<option class="bg-[#0d1520] font-sans" value="forest">Forest</option>
 			</select>
 			<div
 				class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-cyan-400"
@@ -95,7 +106,7 @@
 	</div>
 	<div class="h-5 w-px bg-cyan-500/10"></div>
 	<div class="flex items-center gap-3">
-		<span class="text-[10px] tracking-widest text-slate-500 uppercase">Largura</span>
+		<span class="text-[10px] tracking-widest text-slate-500 uppercase">Width</span>
 		<input
 			type="number"
 			min="9"
@@ -123,7 +134,7 @@
 	<button
 		onclick={ontoggleSoundMode}
 		class="flex cursor-pointer items-center gap-2 text-[10px] tracking-widest text-cyan-400 uppercase transition-colors"
-		title="Alternar entre som da música e som ao tocar nas teclas"
+		title="Toggle between music sound and keystroke sound"
 	>
 		<svg
 			class="h-4 w-4"
@@ -142,15 +153,15 @@
 				<circle cx="15" cy="12" r="3" fill="currentColor"></circle>
 			{/if}
 		</svg>
-		<span>SOM: {soundMode === 'music' ? 'MÚSICA' : 'JOGADOR'}</span>
+		<span>SOUND: {soundMode === 'music' ? 'MUSIC' : 'PLAYER'}</span>
 	</button>
 	<div class="h-5 w-px bg-cyan-500/10"></div>
 	<button
 		onclick={ontoggleKeyboardCompact}
 		class="flex cursor-pointer items-center gap-2 text-[10px] tracking-widest uppercase transition-colors {isKeyboardCompact
-			? 'text-cyan-400'
-			: 'text-slate-500'}"
-		title={isKeyboardCompact ? 'Restaurar altura do teclado' : 'Diminuir altura do teclado'}
+			? 'text-slate-500'
+			: 'text-cyan-400'}"
+		title={isKeyboardCompact ? 'Restore keyboard height' : 'Decrease keyboard height'}
 	>
 		<svg
 			class="h-4 w-4"
@@ -165,7 +176,7 @@
 				d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"
 			/>
 		</svg>
-		<span>Altura</span>
+		<span>{isKeyboardCompact ? 'Small' : 'Normal'}</span>
 	</button>
 </div>
 

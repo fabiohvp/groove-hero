@@ -49,8 +49,7 @@ export const gameState = $state({
 export const scheduledNotes: number[] = [];
 export const pressedKeys = new SvelteMap<number, boolean>();
 
-const songModules = import.meta.glob('/src/lib/database/**/*.json');
-
+// (songModules import.meta.glob removed in favor of static fetching)
 $effect.root(() => {
 	$effect(() => {
 		if (typeof window !== 'undefined') {
@@ -73,11 +72,12 @@ $effect.root(() => {
 		(async () => {
 			const { jsonPath } = songInfo;
 			const normalizedPath = jsonPath.replace(/\\/g, '/');
-			const songPath = `/src/lib/database/${normalizedPath}`;
+			const songPath = `/database/${normalizedPath}`;
 
 			try {
-				const songModule: any = await songModules[songPath]();
-				gameState.currentSong = songModule.default;
+				const res = await fetch(songPath);
+				if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+				gameState.currentSong = await res.json();
 			} catch (e) {
 				console.error(`Failed to load song`, e);
 				gameState.currentSong = { ...defaultSong, name: 'Failed to load song' };
@@ -126,7 +126,7 @@ export function getProgress() {
 }
 
 export function tick(ts: number) {
-	if (!gameState.playing) return;
+	if (!gameState.playing || gameState.countdown !== null) return;
 	if (!gameState.startTime) gameState.startTime = ts;
 
 	const frameDurationMs = ts - gameState.lastFrameTime;

@@ -49,7 +49,7 @@
 			class="absolute inset-x-0 top-0 overflow-hidden bg-white bg-gradient-to-b from-transparent to-cyan-500/5"
 			style="bottom: {pianoLayout.whiteH}px"
 		>
-			<!-- Guias Verticais -->
+			<!-- Vertical Guides -->
 			{#each pianoLayout.keys.filter((k: { type: string }) => k.type === 'white') as key (key)}
 				<div
 					class="absolute inset-y-0 border-r border-black/5"
@@ -57,7 +57,7 @@
 				></div>
 			{/each}
 
-			<!-- Notas Caindo -->
+			<!-- Falling Notes -->
 			{#each gameState.currentSong.notes as note (note)}
 				{@const elapsed = gameState.startTime
 					? (lastTs - gameState.startTime) * gameState.speed + gameState.elapsedBase

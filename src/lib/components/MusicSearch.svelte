@@ -1,9 +1,9 @@
 <script lang="ts">
-	import midiFiles from '$lib/database/db.json';
 	import type { MidiFileInfo } from '$lib/types';
 	import Fuse from 'fuse.js';
+	import { onMount } from 'svelte';
 
-	const MIDI_FILES = midiFiles as MidiFileInfo[];
+	let MIDI_FILES = $state<MidiFileInfo[]>([]);
 	let { onSelect }: { onSelect: (song: MidiFileInfo) => void } = $props();
 
 	let searchTerm = $state('');
@@ -12,15 +12,33 @@
 	let selectedIndex = $state(-1);
 	let inputElement: HTMLInputElement;
 
-	// Novo estado para o filtro de dificuldade
-	let selectedDifficulty = $state('all');
-	const difficulties = ['all', ...new Set(['Beginner', 'Intermediate', 'Advanced'])];
+	onMount(async () => {
+		try {
+			const res = await fetch('/db.json');
+			if (res.ok) {
+				MIDI_FILES = await res.json();
+			}
+		} catch (e) {
+			console.error('Failed to fetch midi files database', e);
+		}
+	});
 
-	// Músicas a serem usadas pelo Fuse, derivadas da dificuldade selecionada
+	// New state for difficulty and category filters
+	let selectedDifficulty = $state('all');
+	let selectedCategory = $state('all');
+	const difficulties = ['all', ...new Set(['Beginner', 'Intermediate', 'Advanced'])];
+	const categories = $derived([
+		'all',
+		...Array.from(new Set(MIDI_FILES.map((s) => s.category))).sort()
+	]);
+
+	// Songs to be used by Fuse, derived from selected difficulty and category
 	const songsToSearch = $derived(
-		selectedDifficulty === 'all'
-			? MIDI_FILES
-			: MIDI_FILES.filter((s) => s.difficulty === selectedDifficulty)
+		MIDI_FILES.filter((s) => {
+			const passDifficulty = selectedDifficulty === 'all' || s.difficulty === selectedDifficulty;
+			const passCategory = selectedCategory === 'all' || s.category === selectedCategory;
+			return passDifficulty && passCategory;
+		})
 	);
 
 	const fuse = $derived(
@@ -31,27 +49,38 @@
 		})
 	);
 
-	function handleInput() {
+	function applySearchOrFilter() {
+		const isCategorySelected = selectedCategory !== 'all';
+		const isDifficultySelected = selectedDifficulty !== 'all';
+		const isSearchValid = searchTerm.trim().length >= 2;
+
+		if (!isCategorySelected && !isDifficultySelected && !isSearchValid) {
+			filteredSongs = [];
+			return;
+		}
+
 		if (searchTerm.trim() === '') {
-			filteredSongs = songsToSearch.slice(0, 35); // Mostra itens iniciais da dificuldade filtrada
+			filteredSongs = songsToSearch; // Show initial items of filtered difficulty
 		} else {
 			filteredSongs = fuse.search(searchTerm).map((result) => result.item);
 		}
-		showDropdown = true;
+	}
+
+	function handleInput() {
+		applySearchOrFilter();
+		showDropdown = filteredSongs.length > 0;
 		selectedIndex = -1;
 	}
-	function handleDifficultyChange() {
+
+	function handleFilterChange() {
 		searchTerm = '';
-		handleInput();
+		applySearchOrFilter();
+		showDropdown = filteredSongs.length > 0;
 	}
 
 	function handleFocus() {
-		if (searchTerm.trim() === '') {
-			filteredSongs = songsToSearch.slice(0, 35);
-		} else {
-			filteredSongs = fuse.search(searchTerm).map((result) => result.item);
-		}
-		showDropdown = true;
+		applySearchOrFilter();
+		showDropdown = filteredSongs.length > 0;
 	}
 
 	function handleBlur() {
@@ -89,12 +118,34 @@
 	<div class="relative">
 		<select
 			bind:value={selectedDifficulty}
-			onchange={handleDifficultyChange}
-			class="h-full appearance-none rounded-sm border border-cyan-500/20 bg-cyan-500/5 py-2 pr-8 pl-3 text-xs font-semibold text-cyan-400 focus:ring-2 focus:ring-cyan-400 focus:outline-none"
+			onchange={handleFilterChange}
+			class="h-full appearance-none rounded-sm border border-cyan-500/20 bg-cyan-500/5 py-1 pr-8 pl-3 text-xs font-semibold text-cyan-400 focus:ring-2 focus:ring-cyan-400 focus:outline-none"
 		>
 			<option class="bg-[#0d1520] font-sans" value="all">Difficulty</option>
 			{#each difficulties.filter((c) => c !== 'all') as difficulty (difficulty)}
 				<option class="bg-[#0d1520] font-sans capitalize" value={difficulty}>{difficulty}</option>
+			{/each}
+		</select>
+		<div
+			class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-cyan-400"
+		>
+			<svg class="h-4 w-4 fill-current" viewBox="0 0 20 20"
+				><path
+					d="M5.516 7.548c.436-.446 1.143-.446 1.579 0L10 10.405l2.905-2.857c.436-.446 1.143-.446 1.579 0 .436.445.436 1.167 0 1.612l-3.694 3.639c-.436.445-1.143.445-1.579 0L5.516 9.16c-.436-.445-.436-1.167 0-1.612z"
+				/></svg
+			>
+		</div>
+	</div>
+
+	<div class="relative">
+		<select
+			bind:value={selectedCategory}
+			onchange={handleFilterChange}
+			class="h-full max-w-[150px] appearance-none rounded-sm border border-cyan-500/20 bg-cyan-500/5 py-1 pr-8 pl-3 text-xs font-semibold text-cyan-400 focus:ring-2 focus:ring-cyan-400 focus:outline-none"
+		>
+			<option class="bg-[#0d1520] font-sans" value="all">Category</option>
+			{#each categories.filter((c) => c !== 'all') as category (category)}
+				<option class="bg-[#0d1520] font-sans capitalize" value={category}>{category}</option>
 			{/each}
 		</select>
 		<div
@@ -151,7 +202,7 @@
 	input {
 		width: 100%;
 		padding-inline: 10px;
-		padding-block: 4px;
+		padding-block: 0px;
 		box-sizing: border-box;
 	}
 	.dropdown {

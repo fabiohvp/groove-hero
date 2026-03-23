@@ -37,7 +37,7 @@
 		const startMidi = 36;
 		const kw = gameState.keyWidthMM * PX_PER_MM;
 		const bw = kw * 0.62;
-		const heightFactor = gameState.isKeyboardCompact ? 1.6 : 3.5;
+		const heightFactor = gameState.isKeyboardCompact ? 1.6 : 2.4;
 		const wh = kw * heightFactor;
 		const bh = wh * 0.63;
 
@@ -68,7 +68,7 @@
 <div
 	class="relative flex h-screen flex-col overflow-hidden bg-[#080c14] font-['Rajdhani'] text-[#e2f0ff]"
 >
-	<!-- Efeito de Grade de Fundo (Exato como original) -->
+	<!-- Background Grid Effect (Exact as original) -->
 	<div
 		class="pointer-events-none fixed inset-0 z-0"
 		style="background: radial-gradient(ellipse at 20% 0%, rgba(0,245,255,0.07) 0%, transparent 60%),
@@ -80,7 +80,7 @@
 	<button
 		class="absolute top-4 right-4 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-cyan-500/20 text-cyan-400 backdrop-blur transition-all hover:bg-cyan-500/40"
 		onclick={() => (showTopBars = !showTopBars)}
-		title={showTopBars ? 'Ocultar opções' : 'Mostrar opções'}
+		title={showTopBars ? 'Hide options' : 'Show options'}
 	>
 		<svg
 			xmlns="http://www.w3.org/2000/svg"

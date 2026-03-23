@@ -5,8 +5,10 @@ import * as fs from 'fs/promises';
 import * as path from 'node:path';
 
 const musicsPath = path.join(process.cwd(), 'static/musics');
-const databasePath = path.join(process.cwd(), 'src/lib/database');
-const midiFilesJsonPath = path.join(databasePath, 'db.json');
+const databasePath = path.join(process.cwd(), 'static/database');
+const staticPath = path.join(process.cwd(), 'static');
+const midiFilesJsonPath = path.join(staticPath, 'db.json');
+
 
 async function createMidis(midiLibraryPath: string) {
 	console.log('Creating MIDIs...');

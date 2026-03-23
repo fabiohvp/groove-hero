@@ -16,8 +16,10 @@
     *   `game.svelte.ts`: Manages the central game state (playing, score, current song) using Svelte 5 Runes (`$state`, `$effect`).
     *   `midiManager.ts`: Handles the parsing of raw MIDI files into a structured JSON format suitable for the game.
     *   `components/`: Reusable Svelte components (Piano, Timeline, Controls, etc.).
-    *   `database/`: Stores the pre-processed JSON representations of MIDI files.
 *   `src/routes/`: SvelteKit file-based routing components.
+*   `static/musics/`: The repository for raw `.mid` or `.midi` files.
+*   `static/database/`: Stores the pre-processed JSON representations of MIDI files.
+*   `static/db.json`: The master index file for quick searching and listing.
 *   `static/musics/`: The repository for raw `.mid` or `.midi` files.
 *   `src/cli.ts`: A command-line utility used to process raw MIDI files from the `static/musics/` directory and generate the JSON database.
 
@@ -40,7 +42,7 @@ You can preview the built application with `npm run preview`.
 
 ### Data Processing Scripts
 The application relies on pre-processed JSON data derived from MIDI files. If you add new MIDI files to `static/musics/`, you must process them using the provided CLI scripts:
-*   **`npm run create-db`**: Parses MIDI files in `static/musics/` and generates individual `.json` song files in `src/lib/database/` then scans the processed files and generates a master `db.json` index file in `src/lib/database/` for quick searching and listing.
+*   **`npm run create-db`**: Parses MIDI files in `static/musics/` and generates individual `.json` song files in `static/database/` then scans the processed files and generates a master `db.json` index file in `static/` for quick searching and listing.
 
 ### Testing & Linting
 *   **Run tests:** `npm run test`

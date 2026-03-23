@@ -1,7 +1,7 @@
 export interface Note {
 	midi: number;
-	t: number; // tempo de início em ms
-	d: number; // duração em ms
+	t: number; // start time in ms
+	d: number; // duration in ms
 }
 
 export interface Song {
