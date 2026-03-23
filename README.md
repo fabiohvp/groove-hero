@@ -8,7 +8,7 @@ A browser-based rhythm piano game inspired by Guitar Hero and VRTuos, built for 
 
 Add .mid or .midi files to the `static/musics/` directory then run `npm run create-db`. This will generate necessary JSON files in `static/database/`.
 
-- Recommended repository with thousands of musics: 
+- Musics were taken from the following repositories and pages: 
   - https://github.com/lucasnfe/adl-piano-midi (general)
   - https://animezen.net/midis (animes)
 
