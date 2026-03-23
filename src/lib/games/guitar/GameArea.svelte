@@ -81,7 +81,7 @@
 
 				{#if yBottom > -50 && yBottom < fallZoneHeight + 50}
 					<div
-						class="absolute flex w-full items-center justify-center transition-all"
+						class="absolute flex w-full items-center justify-center transition-colors"
 						style="top: {yBottom - 16}px;"
 					>
 						<div class="flex h-8 w-8 items-center justify-center rounded-lg border {(isHit || isPlaying) ? (strum.dir === 'up' ? 'border-pink-500/50 bg-pink-500/40 shadow-[0_0_15px_#ec4899]' : 'border-cyan-500/50 bg-cyan-500/40 shadow-[0_0_15px_#00f5ff]') : 'border-white/10 bg-[#0d1520]/80 shadow-md'}">
@@ -122,7 +122,7 @@
 
 					{#if yBottom > 0 && yTop < fallZoneHeight}
 						<div
-							class="absolute rounded-sm border-b-4 opacity-90 transition-all"
+							class="absolute rounded-sm border-b-4 opacity-90 transition-colors"
 							style="
 								left: {getFretLeftPercentage(pos.fretIndex)}%;
 								width: {100 / fretsCount}%;
