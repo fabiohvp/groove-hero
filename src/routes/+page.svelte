@@ -1,3 +1,7 @@
+<script lang="ts">
+	import logo from '$lib/assets/logo.png';
+</script>
+
 <main
 	class="relative flex h-screen w-full flex-col items-center justify-center overflow-hidden bg-[#080c14] font-['Rajdhani']"
 >
@@ -7,11 +11,12 @@
 	></div>
 
 	<div class="z-10 mb-12 flex flex-col items-center">
-		<h1
-			class="bg-gradient-to-r from-cyan-400 to-pink-500 bg-clip-text font-['Orbitron'] text-6xl font-black tracking-widest text-transparent drop-shadow-[0_0_15px_rgba(0,245,255,0.3)]"
-		>
-			GROOVE HERO
-		</h1>
+		<img
+			src={logo}
+			alt="Groove Hero"
+			class="mb-6 h-48 w-auto drop-shadow-[0_0_20px_rgba(0,245,255,0.3)]"
+		/>
+
 		<p class="mt-2 text-lg tracking-[8px] text-slate-400 uppercase">CHOOSE YOUR INSTRUMENT</p>
 	</div>
 

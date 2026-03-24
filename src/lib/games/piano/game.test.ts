@@ -10,7 +10,7 @@ vi.mock('$lib/audio', () => ({
 	stopAllNotes: vi.fn()
 }));
 
-const dbPath = path.resolve(__dirname, '../../static/db.json');
+const dbPath = path.resolve(process.cwd(), 'static/db.json');
 const dbContent = fs.readFileSync(dbPath, 'utf-8');
 const midiFiles = JSON.parse(dbContent);
 
@@ -29,7 +29,7 @@ describe('Game fall synchronization across all database songs', () => {
 
 	for (const midi of midiFiles) {
 		test(`Sync check for ${midi.jsonPath}`, () => {
-			const songPath = path.resolve(__dirname, '../../static/database', midi.jsonPath);
+			const songPath = path.resolve(process.cwd(), 'static/database', midi.jsonPath);
 			const songContent = fs.readFileSync(songPath, 'utf-8');
 			const song = JSON.parse(songContent) as Song;
 

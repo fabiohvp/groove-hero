@@ -1,51 +1,146 @@
-# Groove Hero
+<p align="center">
+  <img src="src/lib/assets/logo.png" alt="Groove Hero" width="180"/>
+</p>
 
-## This project was my way of testing GEMINI AI capabilities. This was done almost all vibe coding.
+A browser-based rhythm piano game inspired by Guitar Hero and VRTuos, designed especially for beginners learning to play piano.
 
-A browser-based rhythm piano game inspired by Guitar Hero and VRTuos, built for beginners learning to play piano. Blocks fall from the top of the screen toward a hit line aligned with an interactive piano keyboard.
-
-## Adding Songs
-
-Add .mid or .midi files to the `static/musics/` directory then run `npm run create-db`. This will generate necessary JSON files in `static/database/`.
-
-- Musics were taken from the following repositories and pages: 
-  - https://github.com/lucasnfe/adl-piano-midi (general)
-  - https://animezen.net/midis (animes)
-
-## How to run locally
-
-Execute `npm run dev -- --open` in the terminal and wait for browser to open and load.
-
-- Suggestion: use it with a projector on top of the piano or with a screen bigger than your piano and try to position the screen inclined above the piano keyboard matching the keys on the screen with the piano keys (adjust keys amount and width as necessary). If you want to use with your TV you can use Port Forwarding and open in the browser or just mirror your screen.
+Blocks fall from the top of the screen toward a hit line aligned with an interactive piano keyboard, helping players develop timing, coordination, and note recognition in a fun and visual way.
 
 ---
 
-## Browser Support
+## 🚀 Getting Started
 
-Works in any browser with Web Audio API and CSS `transform` support — Chrome, Firefox, Safari, Edge (all modern versions, also WebOS Browser).
+### Run locally
+
+```bash
+npm run dev -- --open
+```
+
+Wait for the browser to open automatically and load the game.
 
 ---
 
-## Features
+## 🎵 Adding Songs
 
-1. **User-friendly interface**: Designed for beginners, Groove Hero includes intuitive controls and tutorials that guide players on how to play the game effectively.
-2. **Customizable difficulty levels**: Players can adjust the speed of block falling to match their skill level.
-3. **Customizable piano**: Players can adjust the number of keys and the width of the keys.
-4. **Loop toggle**: Players can loop the song to play it again after it ends.
-5. **Sound mode toggle**: Players can toggle between sound mode and music mode.
-6. **Keyboard compact mode**: Players can toggle between compact and normal mode.
-7. **Timeline**: Full-width bar. Players can scrub through the song to jump to any moment.
-8. **Speed** — 0.25× to 5× in 0.25 steps (default 1×). Changes apply instantly without restarting the song.
+1. Add `.mid` or `.midi` files to:
 
-<!-- ### Controls
+   ```
+   static/musics/
+   ```
 
-- **Mouse / Touch** — click or tap piano keys directly
-- **QWERTY keyboard** — mapped to one octave starting at C4:
+2. Generate the database:
 
-  | Key  | A   | W   | S   | E   | D   | F   | T   | G   | Y   | H   | U   | J   | K   | O   | L   | P   |
-  | ---- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-  | Note | C4  | C#4 | D4  | D#4 | E4  | F4  | F#4 | G4  | G#4 | A4  | A#4 | B4  | C5  | C#5 | D5  | D#5 | -->
+   ```bash
+   npm run create-db
+   ```
 
-## Future
+3. JSON files will be created in:
 
-If this project end up getting popular I'll try adding a way to record the physical keyboard sound to check if user played right or wrong to give feedback and score.
+   ```
+   static/database/
+   ```
+
+### 🎼 MIDI Sources
+
+* https://github.com/lucasnfe/adl-piano-midi (general collection)
+* https://animezen.net/midis (anime songs)
+
+---
+
+## 🎮 Features
+
+* **Beginner-friendly UI**
+  Clean and intuitive interface with simple controls.
+
+* **Adjustable difficulty**
+  Control how fast notes fall to match your skill level.
+
+* **Customizable keyboard**
+
+  * Change number of keys
+  * Adjust key width
+
+* **Playback controls**
+
+  * Loop songs
+  * Scrub timeline
+  * Jump to any section
+
+* **Speed control**
+  Play from **0.25× to 5× speed** (instant changes, no restart needed)
+
+* **Sound modes**
+  Toggle between:
+
+  * Sound mode
+  * Music mode
+
+* **Compact keyboard mode**
+  Switch between compact and full layouts.
+
+---
+
+## 🖥️ Setup Tips (Best Experience)
+
+For a more immersive experience:
+
+* Use a **projector above your piano**
+* Or place a **large screen/TV above the keyboard**
+* Align the on-screen keys with your real piano keys
+* Adjust key count and width to match your instrument
+
+You can also:
+
+* Mirror your screen to a TV
+* Use port forwarding to access the app from another device
+
+---
+
+## 🌐 Browser Support
+
+Works on all modern browsers that support:
+
+* Web Audio API
+* CSS `transform`
+
+Tested on:
+
+* Chrome
+* Firefox
+* Safari
+* Edge
+* WebOS Browser
+
+---
+
+## 🔮 Future Plans
+
+If the project gains traction, planned features include:
+
+* 🎤 **Real-time input detection**
+  Capture audio from a physical piano/keyboard
+
+* 🎯 **Accuracy feedback system**
+  Detect correct vs incorrect notes
+
+* 🏆 **Scoring system**
+  Provide performance metrics and progression
+
+---
+
+## ❤️ Contributing
+
+Feel free to fork the project, open issues, or submit pull requests.
+Ideas, feedback, and improvements are always welcome!
+
+---
+
+## 📌 Notes
+
+This project started as an experiment using AI-assisted ("vibe") coding — and evolved into a practical learning tool for piano beginners.
+
+---
+
+<p align="center">
+  Made with 🎵 and curiosity
+</p>

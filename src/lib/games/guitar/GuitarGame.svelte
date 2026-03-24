@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Controls from '$lib/components/Controls.svelte';
 	import Header from '$lib/components/Header.svelte';
+	import OptionsToggle from '$lib/components/OptionsToggle.svelte';
 	import Hud from '$lib/games/guitar/Hud.svelte';
 	import GameArea from '$lib/games/guitar/GameArea.svelte';
 	import Timeline from '$lib/components/Timeline.svelte';
@@ -58,25 +59,7 @@
                      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(236,72,153,0.03) 40px);"
 	></div>
 
-	<button
-		class="absolute top-4 right-4 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-pink-500/20 text-pink-400 backdrop-blur transition-all hover:bg-pink-500/40"
-		onclick={toggleOptions}
-		title={showTopBars ? 'Hide options' : 'Show options'}
-	>
-		<svg
-			xmlns="http://www.w3.org/2000/svg"
-			class="h-5 w-5"
-			fill="none"
-			viewBox="0 0 24 24"
-			stroke="currentColor"
-		>
-			{#if showTopBars}
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
-			{:else}
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-			{/if}
-		</svg>
-	</button>
+	<OptionsToggle {showTopBars} color="pink" ontoggle={toggleOptions} />
 
 	{#if showTopBars}
 		<Header />
