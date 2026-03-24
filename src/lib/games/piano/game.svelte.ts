@@ -44,7 +44,11 @@ export const gameState = $state({
 	backgroundMode: getSavedSetting('pf_backgroundMode', 'dark') as 'dark' | 'light',
 	soundMode: 'music' as 'music' | 'player',
 	countdown: null as number | null,
-	noteColor: getSavedSetting('pf_noteColor', 'classic') as 'classic' | 'ocean' | 'sunset' | 'synthwave' | 'monochrome' | 'forest'
+	noteColor: getSavedSetting('pf_noteColor', 'classic') as 'classic' | 'ocean' | 'sunset' | 'synthwave' | 'monochrome' | 'forest',
+	notesByMidi: new Map<number, any[]>(),
+	nextNoteToSchedule: 0,
+	nextNoteToHighlight: 0,
+	duration: 1500
 });
 
 export const scheduledNotes: number[] = [];
@@ -79,10 +83,31 @@ $effect.root(() => {
 			try {
 				const res = await fetch(songPath);
 				if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-				gameState.currentSong = await res.json();
+				const songData = await res.json();
+				
+				// Pre-group notes by MIDI for fast lookup during gameplay
+				const grouped = new Map<number, any[]>();
+				songData.notes.forEach((n: any) => {
+					if (!grouped.has(n.midi)) grouped.set(n.midi, []);
+					grouped.get(n.midi)!.push(n);
+				});
+				
+				// Pre-calculate duration
+				let dur = 1500;
+				if (songData.notes.length > 0) {
+					const lastNote = songData.notes.reduce((p: any, c: any) => (c.t + c.d > p.t + p.d ? c : p));
+					dur = lastNote.t + lastNote.d + 1500;
+				}
+
+				gameState.notesByMidi = grouped;
+				gameState.currentSong = songData;
+				gameState.duration = dur;
+				gameState.nextNoteToSchedule = 0;
+				gameState.nextNoteToHighlight = 0;
 			} catch (e) {
 				console.error(`Failed to load song`, e);
 				gameState.currentSong = { ...defaultSong, name: 'Failed to load song' };
+				gameState.notesByMidi = new Map();
 			}
 		})();
 	});
@@ -113,9 +138,7 @@ export function reset() {
 }
 
 export function getDuration() {
-	if (!gameState.currentSong?.notes || gameState.currentSong.notes.length === 0) return 1500;
-	const lastNote = gameState.currentSong.notes.reduce((p, c) => (c.t + c.d > p.t + p.d ? c : p));
-	return lastNote.t + lastNote.d + 1500;
+	return gameState.duration;
 }
 
 export function getProgress() {
@@ -141,13 +164,44 @@ export function tick(ts: number) {
 	const frameScore = (scorePerSecond * frameDurationMs) / 1000;
 
 	for (const midi of pressedKeys.keys()) {
-		const activeNote = gameState.currentSong.notes.find(
-			(n) => n.midi === midi && currentElapsed >= n.t && currentElapsed < n.t + n.d
+		const midiNotes = gameState.notesByMidi.get(midi);
+		if (!midiNotes) continue;
+
+		// Optimize: Binary search would be even better, but searching in midiNotes is much faster than all notes
+		const activeNote = midiNotes.find(
+			(n) => currentElapsed >= n.t && currentElapsed < n.t + n.d
 		);
 
 		if (activeNote && activeNote.hit) {
 			gameState.score += frameScore;
 		}
+	}
+
+	// Just-in-time audio scheduling (Optimized: O(K) instead of O(N))
+	if (gameState.soundMode === 'music') {
+		const lookaheadMs = 100; // Increased lookahead slightly
+		const scheduleLimit = currentElapsed + lookaheadMs * gameState.speed;
+		
+		let idx = gameState.nextNoteToSchedule;
+		const notes = gameState.currentSong.notes;
+		
+		while (idx < notes.length) {
+			const note = notes[idx];
+			if (note.t > scheduleLimit) break;
+			
+			if (note.t >= currentElapsed && !note.isScheduled) {
+				const delay = (note.t - currentElapsed) / gameState.speed;
+				const id = window.setTimeout(() => {
+					if (gameState.playing && !note.hit && gameState.soundMode === 'music') {
+						playNote(note.midi, note.d, gameState.speed);
+					}
+				}, delay);
+				note.isScheduled = true;
+				scheduledNotes.push(id);
+			}
+			idx++;
+		}
+		gameState.nextNoteToSchedule = idx;
 	}
 
 	if (currentElapsed >= getDuration()) {
@@ -164,7 +218,10 @@ export function tick(ts: number) {
 
 export function resetHits() {
 	if (gameState.currentSong?.notes) {
-		gameState.currentSong.notes.forEach((n: any) => (n.hit = false));
+		gameState.currentSong.notes.forEach((n: any) => {
+			n.hit = false;
+			n.isScheduled = false;
+		});
 	}
 }
 
@@ -284,21 +341,11 @@ export function handleKeyUp(midi: number) {
 	}
 }
 
+/* Optimized startAudio is replaced by just-in-time scheduling in tick() */
 export function startAudio() {
 	clearAudio();
-	gameState.currentSong.notes.forEach((note) => {
-		const elapsed = gameState.startTime
-			? (gameState.lastTs - gameState.startTime) * gameState.speed + gameState.elapsedBase
-			: gameState.elapsedBase;
-
-		if (note.t >= elapsed) {
-			const delay = (note.t - elapsed) / gameState.speed;
-			const id = window.setTimeout(() => {
-				if (gameState.playing && !note.hit && gameState.soundMode === 'music') playNote(note.midi, note.d, gameState.speed);
-			}, delay);
-			scheduledNotes.push(id);
-		}
-	});
+	// Reset isScheduled flag when starting/seeking
+	gameState.currentSong.notes.forEach(n => (n.isScheduled = false));
 }
 
 export function clearAudio() {
@@ -309,6 +356,14 @@ export function clearAudio() {
 
 export function seekPercentage(pct: number) {
 	gameState.elapsedBase = pct * getDuration();
+	const currentElapsed = gameState.elapsedBase;
+
+	// Reset scheduler index to find correct starting point
+	let idx = 0;
+	while (idx < gameState.currentSong.notes.length && gameState.currentSong.notes[idx].t < currentElapsed) {
+		idx++;
+	}
+	gameState.nextNoteToSchedule = idx;
 
 	if (gameState.playing) {
 		gameState.lastTs = performance.now();

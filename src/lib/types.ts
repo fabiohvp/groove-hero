@@ -2,6 +2,11 @@ export interface Note {
 	midi: number;
 	t: number; // start time in ms
 	d: number; // duration in ms
+	hit?: boolean;
+	isScheduled?: boolean;
+	v?: number;
+	ch?: number;
+	guitarPos?: { stringIndex: number; fretIndex: number };
 }
 
 export interface Song {
@@ -38,15 +43,6 @@ export interface ParsedMidi {
 	numTracks: number;
 	timeDivision: number;
 	tracks: MidiEvent[][];
-}
-
-export interface Note {
-	midi: number;
-	t: number;
-	d: number;
-	hit: boolean;
-	v?: number;
-	ch?: number;
 }
 
 export interface MidiToNotesResult {

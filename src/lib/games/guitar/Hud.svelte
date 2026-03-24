@@ -23,7 +23,7 @@
 </script>
 
 <div
-	class="z-10 flex flex-nowrap items-center gap-4 overflow-x-auto whitespace-nowrap border-b border-cyan-500/5 bg-[#0b111b]/98 px-8 py-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+	class="z-20 flex flex-nowrap items-center gap-4 overflow-x-auto whitespace-nowrap border-b border-cyan-500/5 bg-[#0b111b]/98 px-8 py-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
 >
 	<!-- <div class="flex items-center gap-3">
 		<span class="text-[10px] tracking-widest text-slate-500 uppercase">Score</span>

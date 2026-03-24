@@ -50,11 +50,31 @@
 
 	let activeGuitarPositions = $derived.by(() => {
 		let positions = new Set<string>();
-		if (gameState.currentSong?.notes) {
-			for (let note of gameState.currentSong.notes) {
-				// Light up if it's within the active pluck window
-				if (currentElapsed >= note.t - 100 && currentElapsed <= note.t + note.d) {
-					const pos = getGuitarPosition(note.midi, c);
+		// Efficiently find notes near currentElapsed using binary search on strums
+		const strums = gameState.strums;
+		if (!strums || strums.length === 0) return positions;
+		
+		let low = 0;
+		let high = strums.length - 1;
+		let index = 0;
+		while (low <= high) {
+			let mid = Math.floor((low + high) / 2);
+			if (strums[mid].t < currentElapsed - 100) {
+				index = mid;
+				low = mid + 1;
+			} else {
+				high = mid - 1;
+			}
+		}
+
+		// Check only a few strums around the current time
+		for (let i = index; i < strums.length; i++) {
+			const strum = strums[i];
+			if (strum.t > currentElapsed + 500) break;
+			
+			for (const note of strum.notes) {
+				if (currentElapsed >= note.t - 50 && currentElapsed <= note.t + Math.max(100, note.d)) {
+					const pos = note.guitarPos || getGuitarPosition(note.midi, c);
 					positions.add(`${pos.stringIndex}-${pos.fretIndex}`);
 				}
 			}
@@ -63,16 +83,19 @@
 	});
 
 	let activeStrumDir = $derived.by(() => {
-		if (!gameState.currentSong?.notes) return null;
-
-		const uniqueTimes = Array.from(new Set(gameState.currentSong.notes.map((n) => n.t))).sort(
-			(a, b) => a - b
-		);
-		for (let index = 0; index < uniqueTimes.length; index++) {
-			const t = uniqueTimes[index];
+		const strums = gameState.strums;
+		if (!strums || strums.length === 0) return null;
+		
+		let low = 0;
+		let high = strums.length - 1;
+		while (low <= high) {
+			let mid = Math.floor((low + high) / 2);
+			const t = strums[mid].t;
 			if (currentElapsed >= t - 50 && currentElapsed <= t + 100) {
-				return index % 2 === 0 ? 'down' : 'up';
+				return strums[mid].dir;
 			}
+			if (t < currentElapsed) low = mid + 1;
+			else high = mid - 1;
 		}
 		return null;
 	});

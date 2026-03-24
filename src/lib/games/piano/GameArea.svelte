@@ -39,6 +39,143 @@
 			black: { bg: 'linear-gradient(to bottom, #166534, #14532d)', shadow: '#14532d88' },
 		}
 	};
+
+	import type { KeyLayout } from '$lib/types';
+
+	// Pre-index keys by MIDI for O(1) lookup
+	const keyMap = $derived(
+		new Map<number, KeyLayout>(pianoLayout.keys.map((k: KeyLayout) => [k.midi, k]))
+	);
+
+	// Calculate frame-wide constants once
+	const elapsed = $derived(gameState.startTime
+		? (lastTs - gameState.startTime) * gameState.speed + gameState.elapsedBase
+		: gameState.elapsedBase);
+	
+	const pxPerMs = $derived(BASE_SPEED * gameState.speed);
+	const currentTheme = $derived(themes[gameState.noteColor as keyof typeof themes] || themes.classic);
+
+	// Derived: only the notes currently visible in the fall zone (Optimized O(log N + K))
+	const visibleNotes = $derived.by(() => {
+		const notes = gameState.currentSong?.notes;
+		if (!notes || notes.length === 0) return [];
+		
+		// Buffer for "fall time" and Note duration
+		// We want to include notes that ARE currently falling or about to fall
+		// Fall time in ms = fallZoneHeight / pxPerMs
+		const fallTimeMs = fallZoneHeight / pxPerMs;
+		
+		// Find first note that could be on screen
+		// Binary search for note.t where note.t + note.d >= elapsed - buffer
+		// For simplicity, let's look for notes starting within a window
+		let start = 0;
+		let low = 0;
+		let high = notes.length - 1;
+		
+		const lookbehindLimit = elapsed - (1000 / pxPerMs); // approx 1000px check
+
+		while (low <= high) {
+			let mid = Math.floor((low + high) / 2);
+			if (notes[mid].t < lookbehindLimit) {
+				low = mid + 1;
+				start = mid;
+			} else {
+				high = mid - 1;
+			}
+		}
+
+		const result = [];
+		const lookaheadLimit = elapsed + fallTimeMs + 100; // time window
+		
+		for (let i = start; i < notes.length; i++) {
+			const note = notes[i];
+			if (note.t > lookaheadLimit) break;
+			
+			const blockH = Math.max(12, note.d * pxPerMs);
+			const ty = (elapsed - note.t) * pxPerMs + (fallZoneHeight - blockH);
+			
+			if (ty > -blockH - 100 && ty < fallZoneHeight + 100) {
+				result.push(note);
+			}
+		}
+		return result;
+	});
+	let canvasEl = $state<HTMLCanvasElement>();
+	
+	function draw() {
+		if (!canvasEl) return;
+		const ctx = canvasEl.getContext('2d');
+		if (!ctx) return;
+
+		// Clear canvas
+		ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+
+		// Scaling for high DPI
+		const dpr = window.devicePixelRatio || 1;
+		
+		visibleNotes.forEach(note => {
+			const blockH = Math.max(12, note.d * pxPerMs);
+			const ty = (elapsed - note.t) * pxPerMs + (fallZoneHeight - blockH);
+			const key = keyMap.get(note.midi);
+			if (!key) return;
+
+			const x = (key.centerX - (key.width - 4) / 2) * dpr;
+			const y = ty * dpr;
+			const w = (key.width - 4) * dpr;
+			const h = blockH * dpr;
+			const radius = 4 * dpr;
+
+			ctx.beginPath();
+			ctx.roundRect(x, y, w, h, radius);
+			
+			// Fill style (mimicking gradients)
+			let gradient = ctx.createLinearGradient(x, y, x, y + h);
+			if (note.hit) {
+				gradient.addColorStop(0, '#fde047');
+				gradient.addColorStop(1, '#facc15');
+				ctx.shadowColor = '#facc1588';
+				ctx.strokeStyle = '#eab308';
+			} else if (key.type === 'black') {
+				// Rough approximation of the CSS gradient: #ff2d78bb, #ff2d78
+				gradient.addColorStop(0, '#ff2d78bb'); 
+				gradient.addColorStop(1, '#ff2d78');
+				ctx.shadowColor = '#ff2d7888';
+				ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+			} else {
+				// Rough approximation of the CSS gradient: rgb(130 225 159), rgb(130 185 10)
+				gradient.addColorStop(0, '#82e19f'); 
+				gradient.addColorStop(1, '#82b90a');
+				ctx.shadowColor = '#00f5ff88';
+				ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+			}
+			
+			ctx.fillStyle = gradient;
+			ctx.shadowBlur = 10 * dpr;
+			ctx.fill();
+			ctx.lineWidth = 1 * dpr;
+			ctx.stroke();
+			
+			// Reset shadow for next note
+			ctx.shadowBlur = 0;
+		});
+	}
+
+	$effect(() => {
+		if (canvasEl) {
+			const dpr = window.devicePixelRatio || 1;
+			canvasEl.width = (pianoLayout.totalWidth || 0) * dpr;
+			canvasEl.height = fallZoneHeight * dpr;
+			canvasEl.style.width = `${pianoLayout.totalWidth}px`;
+			canvasEl.style.height = `${fallZoneHeight}px`;
+		}
+	});
+
+	$effect(() => {
+		// Trigger redraw on frame updates
+		if (lastTs || visibleNotes) {
+			draw();
+		}
+	});
 </script>
 
 <main class="z-5 flex-1 self-center overflow-x-auto overflow-y-hidden">
@@ -57,36 +194,8 @@
 				></div>
 			{/each}
 
-			<!-- Falling Notes -->
-			{#each gameState.currentSong.notes as note (note)}
-				{@const elapsed = gameState.startTime
-					? (lastTs - gameState.startTime) * gameState.speed + gameState.elapsedBase
-					: gameState.elapsedBase}
-				{@const currentTheme = themes[gameState.noteColor as keyof typeof themes] || themes.classic}
-				{@const pxPerMs = BASE_SPEED * gameState.speed}
-				{@const blockH = Math.max(12, note.d * pxPerMs)}
-				{@const ty = (elapsed - note.t) * pxPerMs + (fallZoneHeight - blockH)}
-
-				{#if ty > -blockH && ty < fallZoneHeight + 100}
-					{@const key = pianoLayout.keys.find((k: { midi: number }) => k.midi === note.midi)}
-					{#if key}
-						<div
-							class="absolute rounded-md border-2 shadow-lg transition-colors"
-							style="left: {key.centerX - (key.width - 4) / 2}px; 
-                                    width: {key.width - 4}px; 
-                                    height: {blockH}px; 
-                                    transform: translateY({ty}px);
-									background: {note.hit
-								? 'linear-gradient(to bottom, #fde047, #facc15)'
-								: key.type === 'black'
-									? currentTheme.black.bg
-									: currentTheme.white.bg};
-									box-shadow: 0 0 15px {note.hit ? '#facc1588' : key.type === 'black' ? currentTheme.black.shadow : currentTheme.white.shadow};
-									border-color: {note.hit ? '#eab308' : 'rgba(255, 255, 255, 0.2)'};"
-						></div>
-					{/if}
-				{/if}
-			{/each}
+			<!-- Falling Notes - Canvas based for high performance -->
+			<canvas bind:this={canvasEl} class="absolute inset-0 pointer-events-none"></canvas>
 
 			<!-- Hit Line -->
 			<div

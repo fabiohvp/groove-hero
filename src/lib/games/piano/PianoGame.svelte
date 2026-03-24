@@ -140,7 +140,7 @@
 
 	{#if gameState.countdown !== null}
 		<div
-			class="pointer-events-none absolute inset-0 z-50 flex items-center justify-center bg-[#080c14]/50 backdrop-blur-sm"
+			class="pointer-events-none absolute inset-0 z-100 flex items-center justify-center bg-[#080c14]/50 backdrop-blur-sm"
 		>
 			<span
 				class="font-['Orbitron'] text-[15rem] font-bold text-cyan-400 drop-shadow-[0_0_40px_rgba(0,245,255,0.8)]"

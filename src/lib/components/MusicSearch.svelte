@@ -222,6 +222,7 @@
 	.search-container {
 		position: relative;
 		width: 300px;
+		z-index: 50;
 	}
 	input {
 		width: 100%;
@@ -240,7 +241,7 @@
 		max-height: 300px;
 		overflow-y: auto;
 		background: #0d1520;
-		z-index: 1000;
+		z-index: 9999;
 	}
 	.dropdown button {
 		display: grid;
