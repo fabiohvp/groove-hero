@@ -53,7 +53,7 @@
 		// Efficiently find notes near currentElapsed using binary search on strums
 		const strums = gameState.strums;
 		if (!strums || strums.length === 0) return positions;
-		
+
 		let low = 0;
 		let high = strums.length - 1;
 		let index = 0;
@@ -71,7 +71,7 @@
 		for (let i = index; i < strums.length; i++) {
 			const strum = strums[i];
 			if (strum.t > currentElapsed + 500) break;
-			
+
 			for (const note of strum.notes) {
 				if (currentElapsed >= note.t - 50 && currentElapsed <= note.t + Math.max(100, note.d)) {
 					const pos = note.guitarPos || getGuitarPosition(note.midi, c);
@@ -82,10 +82,73 @@
 		return positions;
 	});
 
+	let nextStrumPositions = $derived.by(() => {
+		let positions = new Set<string>();
+		const strums = gameState.strums;
+		if (!strums || strums.length === 0) return positions;
+
+		let low = 0;
+		let high = strums.length - 1;
+		let startIndex = 0;
+		while (low <= high) {
+			let mid = Math.floor((low + high) / 2);
+			if (strums[mid].t < currentElapsed + 100) {
+				startIndex = mid + 1;
+				low = mid + 1;
+			} else {
+				high = mid - 1;
+				startIndex = mid;
+			}
+		}
+
+		if (startIndex < strums.length) {
+			for (const note of strums[startIndex].notes) {
+				const pos = note.guitarPos || getGuitarPosition(note.midi, c);
+				positions.add(`${pos.stringIndex}-${pos.fretIndex}`);
+			}
+		}
+		return positions;
+	});
+
+	let laterUpcomingPositions = $derived.by(() => {
+		let positions = new Set<string>();
+		const strums = gameState.strums;
+		if (!strums || strums.length === 0) return positions;
+
+		let low = 0;
+		let high = strums.length - 1;
+		let startIndex = 0;
+		while (low <= high) {
+			let mid = Math.floor((low + high) / 2);
+			if (strums[mid].t < currentElapsed + 100) {
+				startIndex = mid + 1;
+				low = mid + 1;
+			} else {
+				high = mid - 1;
+				startIndex = mid;
+			}
+		}
+
+		// Look ahead ~3 seconds (to match fall zone visibility)
+		const lookaheadMs = 3000;
+		const lookaheadLimit = currentElapsed + lookaheadMs;
+
+		// Start from startIndex + 1 to show only "later" ones
+		for (let i = startIndex + 1; i < strums.length; i++) {
+			const strum = strums[i];
+			if (strum.t > lookaheadLimit) break;
+			for (const note of strum.notes) {
+				const pos = note.guitarPos || getGuitarPosition(note.midi, c);
+				positions.add(`${pos.stringIndex}-${pos.fretIndex}`);
+			}
+		}
+		return positions;
+	});
+
 	let activeStrumDir = $derived.by(() => {
 		const strums = gameState.strums;
 		if (!strums || strums.length === 0) return null;
-		
+
 		let low = 0;
 		let high = strums.length - 1;
 		while (low <= high) {
@@ -222,9 +285,18 @@
 							>
 								{#if activeGuitarPositions.has(s + '-' + f)}
 									<div
-										class="absolute z-30 h-5 w-5 rounded-full ring-2 ring-white/50"
+										class="absolute z-30 h-6 w-6 rounded-full ring-2 ring-white/50"
 										style="background: {currentTheme.black.bg}; box-shadow: 0 0 20px {currentTheme
 											.black.shadow};"
+									></div>
+								{/if}
+								{#if nextStrumPositions.has(s + '-' + f)}
+									<div
+										class="absolute z-50 h-4.5 w-4.5 rounded-full bg-yellow-200/60 shadow-[0_0_12px_rgba(254,240,138,0.9)]"
+									></div>
+								{:else if laterUpcomingPositions.has(s + '-' + f)}
+									<div
+										class="absolute z-40 h-2.5 w-2.5 rounded-full bg-yellow-200/40 shadow-[0_0_6px_rgba(254,240,138,0.5)]"
 									></div>
 								{/if}
 							</div>
